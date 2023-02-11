@@ -2,7 +2,11 @@ import { Request, Response } from 'express';
 import format from 'date-fns/format';
 import CommentsModel, { CommentInterface } from '../model/comments';
 import commentsServices from '../services/comments.services';
-import { deleteObjectInterface } from '../interfaces/apiInterfaces.interfaces';
+import {
+    deleteObjectInterface,
+    editCommentObjectInterface,
+    editCommentScoreObjectInterface,
+} from '../interfaces/apiInterfaces.interfaces';
 
 const getComments = async (req: Request, res: Response) => {
     console.log(req.originalUrl);
@@ -32,7 +36,31 @@ const addComment = async (req: Request, res: Response) => {
         .json({ message: result.message, commentId: result?.commentId, reason: result?.reason });
 };
 
-const updateComment = async (req: Request, res: Response) => {};
+const editComment = async (req: Request, res: Response) => {
+    console.log(req.originalUrl);
+    const { indentLevel, comments, content } = req.body;
+    const editObject = {
+        indentLevel,
+        comments,
+        content,
+    } as editCommentObjectInterface;
+
+    const result = await commentsServices.editComment(editObject);
+    return res.status(result.status).json({ message: result.message, reason: result?.reason });
+};
+
+const updateScore = async (req: Request, res: Response) => {
+    console.log(req.originalUrl);
+    const { indentLevel, comments, scoreUp } = req.body;
+    const editObject = {
+        indentLevel,
+        comments,
+        scoreUp,
+    } as editCommentScoreObjectInterface;
+
+    const result = await commentsServices.editScore(editObject);
+    return res.status(result.status).json({ message: result.message, reason: result?.reason });
+};
 
 const deleteComment = async (req: Request, res: Response) => {
     console.log(req.originalUrl);
@@ -46,4 +74,4 @@ const deleteComment = async (req: Request, res: Response) => {
     return res.status(result.status).json({ message: result.message, reason: result?.reason });
 };
 
-export default { getComments, addComment, updateComment, deleteComment };
+export default { getComments, addComment, editComment, updateScore, deleteComment };
