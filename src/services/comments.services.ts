@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { deleteObjectInterface } from '../interfaces/apiInterfaces.interfaces';
 import CommentsModel, { CommentInterface, commentSchema } from '../model/comments';
 
 async function saveComment(
@@ -19,7 +20,6 @@ async function saveComment(
 
             //add another indent comment
             if (commentIndent.level === 1) {
-                console.log(commentTree);
                 await CommentsModel.findOneAndUpdate(
                     { _id: new mongoose.Types.ObjectId(commentIndent.commentIds[0]) },
                     {
@@ -29,7 +29,7 @@ async function saveComment(
                     }
                 );
             } else {
-                const result = await CommentsModel.updateOne(
+                await CommentsModel.updateOne(
                     { _id: new mongoose.Types.ObjectId(commentIndent.commentIds[0]) },
                     {
                         $push: {
@@ -53,4 +53,49 @@ async function saveComment(
     }
 }
 
-export default { saveComment };
+async function deleteComment(
+    object: deleteObjectInterface
+): Promise<{ status: number; message: string; reason?: any }> {
+    const isExists = await CommentsModel.findOne({
+        _id: new mongoose.Types.ObjectId(object.comments[0]),
+    }).exec();
+    if (!isExists) return { status: 404, message: 'Could not find given comment' };
+
+    try {
+        if (object.indentLevel === 0) {
+            await CommentsModel.deleteOne({ _id: new mongoose.Types.ObjectId(object.comments[0]) });
+        } else {
+            if (object.indentLevel === 1) {
+                await CommentsModel.findOneAndUpdate(
+                    { _id: new mongoose.Types.ObjectId(object.comments[0]) },
+                    {
+                        $pull: {
+                            responses: { _id: new mongoose.Types.ObjectId(object.comments[1]) },
+                        },
+                    }
+                );
+            } else {
+                await CommentsModel.updateOne(
+                    { _id: new mongoose.Types.ObjectId(object.comments[0]) },
+                    {
+                        $pull: {
+                            'responses.$[comment].responses': { _id: new mongoose.Types.ObjectId(object.comments[2]) },
+                        },
+                    },
+                    {
+                        arrayFilters: [
+                            {
+                                'comment._id': new mongoose.Types.ObjectId(object.comments[1]),
+                            },
+                        ],
+                    }
+                );
+            }
+        }
+        return { status: 202, message: 'Comment deleted successfully!' };
+    } catch (err) {
+        return { status: 500, message: 'Could not delete comment', reason: err };
+    }
+}
+
+export default { saveComment, deleteComment };

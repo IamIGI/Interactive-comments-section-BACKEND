@@ -1,15 +1,18 @@
 import { Request, Response } from 'express';
 import format from 'date-fns/format';
-import { CommentInterface } from '../model/comments';
+import CommentsModel, { CommentInterface } from '../model/comments';
 import commentsServices from '../services/comments.services';
+import { deleteObjectInterface } from '../interfaces/apiInterfaces.interfaces';
 
-const getComments = async (req: Request, res: Response) => {};
+const getComments = async (req: Request, res: Response) => {
+    console.log(req.originalUrl);
+    const result = await CommentsModel.find({}).exec();
+    return res.status(200).json(result);
+};
 
 const addComment = async (req: Request, res: Response) => {
     console.log(req.originalUrl);
     const { userId, image, nickname, message, tagUser, commentIndent } = req.body as CommentInterface;
-
-    //check comments indent, if '0' then create new comment tree else assign comment to response field in given tree
 
     let commentTree: CommentInterface = {
         userId,
@@ -31,6 +34,16 @@ const addComment = async (req: Request, res: Response) => {
 
 const updateComment = async (req: Request, res: Response) => {};
 
-const deleteComment = async (req: Request, res: Response) => {};
+const deleteComment = async (req: Request, res: Response) => {
+    console.log(req.originalUrl);
+    const { indentLevel, comments } = req.body;
+    const deleteObject = {
+        indentLevel,
+        comments,
+    } as deleteObjectInterface;
+
+    const result = await commentsServices.deleteComment(deleteObject);
+    return res.status(result.status).json({ message: result.message, reason: result?.reason });
+};
 
 export default { getComments, addComment, updateComment, deleteComment };
