@@ -18,11 +18,8 @@ async function saveComment(
             if (!isExists) return { status: 404, message: 'Could not find given comment' };
 
             //add another indent comment
-            // commentSchema.add({ responses: [commentSchema] }); // recursive
-
             if (commentIndent.level === 1) {
                 console.log(commentTree);
-                console.log('level 1');
                 await CommentsModel.findOneAndUpdate(
                     { _id: new mongoose.Types.ObjectId(commentIndent.commentIds[0]) },
                     {
@@ -32,8 +29,6 @@ async function saveComment(
                     }
                 );
             } else {
-                console.log('level 2');
-                console.log(commentIndent.commentIds[0], commentIndent.commentIds[1]);
                 const result = await CommentsModel.updateOne(
                     { _id: new mongoose.Types.ObjectId(commentIndent.commentIds[0]) },
                     {
@@ -49,7 +44,6 @@ async function saveComment(
                         ],
                     }
                 );
-                console.log(result);
             }
 
             return { status: 201, message: `Comment added as child comment, indent: ${commentIndent.level}` };

@@ -81,7 +81,7 @@ commentSchema.add({
         commentIds: [String],
     },
     responses: [commentSchema],
-});
+}); // adding schema to schema make it recursive
 
 const CommentsModel = mongoose.model<CommentDocument>('comments', commentSchema);
 
