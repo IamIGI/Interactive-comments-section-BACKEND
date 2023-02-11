@@ -6,6 +6,7 @@ const router = express.Router();
 router.route('/all').get(commentsController.getComments);
 router.route('/add').post(commentsController.addComment);
 router.route('/delete').delete(commentsController.deleteComment);
-router.route('/update').patch(commentsController.updateComment);
+router.route('/edit').patch(commentsController.editComment);
+router.route('/score').patch(commentsController.updateScore);
 
 export = router;

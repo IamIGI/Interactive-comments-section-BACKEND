@@ -6,10 +6,6 @@ export interface CommentInterface {
     nickname: string;
     date: string;
     message: string;
-    likes?: {
-        up: number;
-        down: number;
-    };
     score: number;
     tagUser: {
         isTrue: boolean;
@@ -26,10 +22,6 @@ export interface CommentInterface {
         nickname: string;
         date: string;
         message: string;
-        likes?: {
-            up: number;
-            down: number;
-        };
         score: number;
         tagUser: {
             isTrue: boolean;
@@ -54,16 +46,6 @@ commentSchema.add({
     nickname: String,
     date: String,
     message: String,
-    likes: {
-        up: {
-            type: Number,
-            default: 0,
-        },
-        down: {
-            type: Number,
-            default: 0,
-        },
-    },
     score: Number,
     tagUser: {
         isTrue: {
