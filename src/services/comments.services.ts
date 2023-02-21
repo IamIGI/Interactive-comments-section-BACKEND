@@ -1,3 +1,4 @@
+import format from 'date-fns/format';
 import mongoose from 'mongoose';
 import {
     deleteObjectInterface,
@@ -117,6 +118,7 @@ async function editComment(
                 {
                     $set: {
                         message: object.content,
+                        date: format(new Date(), 'yyyy.MM.dd.HH.mm.ss'),
                     },
                 }
             );
@@ -127,6 +129,7 @@ async function editComment(
                     {
                         $set: {
                             'responses.$[comment].message': object.content,
+                            'responses.$[comment].date': format(new Date(), 'yyyy.MM.dd.HH.mm.ss'),
                         },
                     },
                     {
@@ -143,6 +146,10 @@ async function editComment(
                     {
                         $set: {
                             'responses.$[comment1].responses.$[comment2].message': object.content,
+                            'responses.$[comment1].responses.$[comment2].date': format(
+                                new Date(),
+                                'yyyy.MM.dd.HH.mm.ss'
+                            ),
                         },
                     },
                     {
